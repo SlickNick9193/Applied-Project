@@ -13,8 +13,8 @@ const redis = createClient({ url: REDIS_URL });
 // ── Realistic data pools ──
 
 const COLLECTORS = [
-  'Sunset', 'Wasser', 'Frazier', 'Tweedy', 'Highline',
-  'Mesa', 'Canyon', 'Desert', 'Pueblo', 'Ridgeline'
+  'Alpha', 'Bravo', 'Charlie', 'Delta', 'Echo',
+  'Foxtrot', 'Golf', 'Hotel', 'India', 'Juliet'
 ];
 
 const CONFIG_GROUPS = ['RES G', 'RES E', 'COM G', 'COM E', 'IND G'];
@@ -26,7 +26,7 @@ const STATUS_GROUPS = [
 
 const REPROGRAM_STATUSES = ['Completed', 'Same Rate', 'Refer', 'Attempt Zap/Erase'];
 const REPROGRAM_REASONS = [
-  'Solar', 'MIS Error', 'S4X Meter', 'Refer Rate Code 1102',
+  'Solar', 'Configuration Mismatch', 'Pending Review',
   'Endpoint firmware is not the correct version for this configuration group.',
   'The command cannot be issued to the endpoint when endpoint is in Failed state.',
   'The endpoint for the meter is in inventory state.'
@@ -42,7 +42,7 @@ const FIRMWARE_VERSIONS = [
   'S5GS3B-21.63', 'S5GS24-13.61', '251284-13.59'
 ];
 
-const RATE_CODES = ['0805', '0301', '0201', '1102', '1110', '1310', '0302', '1607'];
+const RATE_CODES = ['R-001', 'R-002', 'C-001', 'C-002', 'I-001', 'I-002', 'R-003', 'C-003'];
 
 // ── Helpers ──
 
