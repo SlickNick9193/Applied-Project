@@ -1,0 +1,82 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: shh_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: system_health_hub
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: shh_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./backend
+    container_name: shh_backend
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env
+    ports:
+      - "5000:5001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+
+  meter-simulator:
+    build: ./simulator
+    container_name: shh_simulator
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://postgres:password@postgres:5432/system_health_hub
+      REDIS_URL: redis://redis:6379
+      INTERVAL_MS: 10000
+      BATCH_SIZE: 100
+      FAILURE_RATE: 0.15
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  frontend:
+    build: ./frontend/system-health-hub-ui
+    container_name: shh_frontend
+    restart: unless-stopped
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend/system-health-hub-ui:/app
+      - /app/node_modules
+
+volumes:
+  postgres_data:
+  redis_data:
